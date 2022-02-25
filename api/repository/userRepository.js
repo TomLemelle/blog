@@ -1,7 +1,7 @@
 const { User } = require("../models");
 
 exports.createUser = async (user) => {
-  return await User.findOrCreate({
+  return await User.create({
     where: { email: user.email },
     defaults: {
       firstName: user.firstName,

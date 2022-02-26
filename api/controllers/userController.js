@@ -3,7 +3,7 @@
 const db = require("../models");
 const userModel = db.User;
 const bcryptjs = require("bcryptjs");
-const { displayStatus, stringify } = require("../utils/utils");
+const { displayStatus, stringify, createJWT } = require("../utils/utils");
 const { createUser } = require("../repository/userRepository");
 
 //fetch data
@@ -21,8 +21,9 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.auth = async (req, res) => {
+  const { email, passsword } = req.body;
   //validate request
-  if (req.body.email === null || req.body.password === null) {
+  if (email === null || passsword === null) {
     displayStatus(500, "Error", "Email or password cannot be null !");
   }
 
@@ -39,8 +40,9 @@ exports.auth = async (req, res) => {
       }
       bcryptjs.compare(req.body.password, data.password, (err, result) => {
         if (result == true) {
+          const token = createJWT({ email, passsword });
           delete data.password;
-          displayStatus(res, 200, "OK", data);
+          displayStatus(res, 200, "OK", { token: token, user: data });
         } else {
           displayStatus(
             res,
